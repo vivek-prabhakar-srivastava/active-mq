@@ -1,0 +1,74 @@
+---
+# tasks file for activemq
+# location  where tarfile download
+- file:
+   path: "{{ where_install }}"
+   state: directory
+
+# switch to directory 
+- name: switch to directory 
+  shell: cd "{{ where_install }}"
+- user:
+    name: activemq
+    home: "{{ where_install }}"
+    state: present
+
+# Unarchive a file that needs to be downloaded
+- name: Unarchive a file that needs to be downloaded (added in 2.0)
+  unarchive:
+    src: https://archive.apache.org/dist/activemq/5.14.0/apache-activemq-5.14.0-bin.tar.gz
+    dest: "{{ where_install }}"
+    remote_src: yes
+
+# copy untar file to perticular directory 
+- file:
+    src: "{{ where_install }}apache-activemq-5.14.0"
+    dest: "{{ where_install }}{{ name_of_unarchive }}"
+    state: link
+  remote_src: true
+
+# copy env file to activemq 
+- copy:
+    src: "{{ where_install }}{{ name_of_unarchive }}/bin/env"
+    dest: /etc/default/activemq
+    owner: root 
+    remote_src: true
+
+# adding config file using template 
+- template:
+    src: "{{ template_name_conf }}"
+    dest: /etc/default/activemq
+
+# copy  service file for activemq with root permission 
+- copy:
+    src: "{{ where_install }}{{ name_of_unarchive }}/bin/activemq"
+    dest:  /etc/init.d
+    owner: activemq
+    mode: 0777
+    remote_src: true
+
+# create a directory for activemq-data
+- file:
+   path: "{{ where_install }}activemq-data"
+   state: directory
+
+# create directory for kahadb 
+- file:
+   path:  "{{ where_install }}activemq-data/kahadb"
+   state: directory
+
+# create directory for localhost 
+- file:
+   path: "{{ where_install }}activemq-data/localhost"
+   state: directory
+
+# update rc.d file 
+- name: To update-rc.d 
+  command: update-rc.d activemq defaults
+
+# service restart 
+- service:
+    name: activemq
+    state: started
+
+

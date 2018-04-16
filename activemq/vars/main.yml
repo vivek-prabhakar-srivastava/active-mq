@@ -1,0 +1,5 @@
+---
+# vars file for activemq
+where_install: /disk2/
+name_of_unarchive: activemq
+template_name_conf: activemq.conf.j2

@@ -1,0 +1,7 @@
+---
+- hosts: java
+  become: true
+  roles:
+    - "/etc/ansible/roles/activemq" 
+  remote_user: root
+
